@@ -1,14 +1,32 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv"
-dotenv.config();
-
-mongoose.connect(process.env.MONGO_URL as string);
 
 const UserSchema = new mongoose.Schema({
-    userName: String,
-    firstName: String,
-    lastName: String,
-    password: String
+    userName: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        lowercase: true,
+        minLength: 3,
+        maxLength: 30
+    },
+    firstName: {
+        type: String,
+        required: true,
+        trim: true,
+        maxLength: 50
+    },
+    lastName: {
+        type: String,
+        required: true,
+        trim: true,
+        maxLength: 50
+    },
+    password: {
+        type: String,
+        required: true,
+        minLength: 8
+    }
 })
 
 export const UserModel = mongoose.model('users', UserSchema);
