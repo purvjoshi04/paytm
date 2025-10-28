@@ -140,3 +140,51 @@ userRouter.post("/signin", async (req, res) => {
         });
     }
 });
+
+const updateBody = z.object({
+    password: z.string().optional(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+});
+
+userRouter.put("/", async (req, res) => {
+    const { success } = updateBody.safeParse(req.body)
+    if (!success) {
+        res.status(411).json({
+            message: "Error while updating information"
+        })
+    }
+
+    await UserModel.updateOne(req.body, {
+        id: req.userId
+    })
+
+    res.json({
+        message: "Updated successfully"
+    })
+});
+
+userRouter.get("/bulk", async(req, res) => {
+    const filter = req.query.filter || "";
+
+    const users = await UserModel.find({
+        $or: [{
+            firstName: {
+                "$regex": filter
+            }
+        }, {
+            lastName: {
+                "$regex": filter
+            }
+        }]
+    })
+
+    res.json({
+        user: users.map(user => ({
+            userName: user.userName,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            _id: user._id
+        }))
+    })
+});
