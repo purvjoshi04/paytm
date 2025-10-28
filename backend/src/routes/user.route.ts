@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import z from "zod";
-import { UserModel } from "../db/db.js";
+import { AccountModel, UserModel } from "../db/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -58,7 +58,7 @@ userRouter.post("/signup", async (req: Request, res: Response) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await UserModel.create({
+        const user = await UserModel.create({
             userName,
             email,
             password: hashedPassword,
@@ -66,6 +66,12 @@ userRouter.post("/signup", async (req: Request, res: Response) => {
             firstName
         });
 
+        const userId = user._id;
+
+        await AccountModel.create({
+            userId,
+            balance: 1 + Math.random() * 10000
+        });
         return res.status(201).json({
             success: true,
             message: "You are signed up!"
@@ -164,7 +170,7 @@ userRouter.put("/", async (req, res) => {
     })
 });
 
-userRouter.get("/bulk", async(req, res) => {
+userRouter.get("/bulk", async (req, res) => {
     const filter = req.query.filter || "";
 
     const users = await UserModel.find({
