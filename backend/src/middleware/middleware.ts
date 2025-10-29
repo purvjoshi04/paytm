@@ -20,7 +20,7 @@ export const userMiddleware = (req: Request, res: Response, next: NextFunction) 
             return res.status(403).json({ message: "Invalid token payload" });
         }
 
-        req.userId = decoded.id;
+        req.userId = decoded.userId;
         next();
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
