@@ -72,9 +72,15 @@ userRouter.post("/signup", async (req: Request, res: Response) => {
             userId,
             balance: 1 + Math.random() * 10000
         });
+        const token = jwt.sign(
+            { userId: user._id, email: user.email },
+            process.env.USER_JWT_SECRET!,
+            { expiresIn: '7d' }
+        );
         return res.status(201).json({
             success: true,
-            message: "You are signed up!"
+            message: "You are signed up!",
+            token
         });
 
     } catch (error) {
