@@ -1,10 +1,14 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 import { mainRouter } from "./routes/index.route.js";
 dotenv.config({path: "../.env"});
 
 const app = express();
+app.use(cors({
+    origin: process.env.FRONTEND_URL
+}));
 app.use(express.json());
 app.use("/api/v1", mainRouter)
 
