@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { mainRouter } from "./routes/index.route.js";
-dotenv.config();
+dotenv.config({path: "../.env"});
 
 const app = express();
 app.use(express.json());
