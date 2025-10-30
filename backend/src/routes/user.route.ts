@@ -4,6 +4,7 @@ import { AccountModel, UserModel } from "../db/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { userMiddleware } from "../middleware/middleware.js";
 dotenv.config();
 
 export const userRouter = Router();
@@ -176,20 +177,50 @@ userRouter.put("/", async (req, res) => {
     })
 });
 
-userRouter.get("/bulk", async (req, res) => {
+userRouter.get("/me", userMiddleware, async (req, res) => {
+    try {
+        const user = await UserModel.findById(req.userId).select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        res.json({
+            user: {
+                id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                userName: user.userName
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error fetching user"
+        });
+    }
+});
+
+userRouter.get("/bulk", userMiddleware, async (req, res) => {
     const filter = req.query.filter || "";
+    const currentUserId = req.userId;
 
     const users = await UserModel.find({
+        _id: { $ne: currentUserId },
         $or: [{
             firstName: {
-                "$regex": filter
+                "$regex": filter,
+                "$options": "i"
             }
         }, {
             lastName: {
-                "$regex": filter
+                "$regex": filter,
+                "$options": "i"
             }
         }]
-    })
+    });
 
     res.json({
         user: users.map(user => ({
