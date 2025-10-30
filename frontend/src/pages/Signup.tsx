@@ -6,6 +6,7 @@ import { InputBox } from "../components/InputBox";
 import { SubHeading } from "../components/SubHeading"
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { PasswordInput } from "../components/PasswordInput";
 
 export const Signup = () => {
     const navigate = useNavigate();
@@ -14,6 +15,7 @@ export const Signup = () => {
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
     return (
         <div className="bg-slate-300 h-screen flex justify-center">
@@ -33,12 +35,15 @@ export const Signup = () => {
                     <InputBox placeholder="johndoe@gmail.com" label={"Email"} onChange={(e) => {
                         setEmail(e.target.value)
                     }} />
-                    <InputBox type="password" placeholder="Example@123" label={"Password"} onChange={(e) => {
-                        setPassword(e.target.value)
-                    }} />
+                    <PasswordInput
+                        placeholder="Example@123"
+                        label="Password"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
                     <div className="pt-4">
                         <Button
-                            label="Sign up"
+                            label={loading ? "Signing up..." : "Sign up"}
+                            disabled={loading}
                             onClick={async () => {
                                 try {
                                     const response = await axios.post(
@@ -56,6 +61,8 @@ export const Signup = () => {
                                 } catch (error) {
                                     console.error("Signup failed:", error);
                                     alert("Signup failed. Please try again.");
+                                }finally {
+                                    setLoading(false)
                                 }
                             }}
                         />
